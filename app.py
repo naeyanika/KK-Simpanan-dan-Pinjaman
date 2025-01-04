@@ -103,4 +103,3 @@ if file_pinjaman and file_simpanan:
                         )
             except Exception as e:
                 st.error(f"Terjadi kesalahan saat mengunduh KK Simpanan: {e}")
-
