@@ -65,43 +65,43 @@ if file_pinjaman and file_simpanan:
         st.dataframe(kk_simpanan)
 
         # Tombol untuk mengunduh file Excel KK Pinjaman
-if st.button("Unduh Kertas Kerja Pinjaman"):
-    try:
+        if st.button("Unduh Kertas Kerja Pinjaman"):
+            try:
         # Menulis KK Pinjaman ke file
-        with pd.ExcelWriter("KK_Pinjaman_Output.xlsx") as writer:
-            kk_pinjaman.to_excel(writer, sheet_name="KK Pinjaman", index=False)
+                with pd.ExcelWriter("KK_Pinjaman_Output.xlsx") as writer:
+                    kk_pinjaman.to_excel(writer, sheet_name="KK Pinjaman", index=False)
         
         # Membaca file sebagai binary untuk unduhan
-        with open("KK_Pinjaman_Output.xlsx", "rb") as f:
-            data = f.read()
+                with open("KK_Pinjaman_Output.xlsx", "rb") as f:
+                    data = f.read()
         
         # Tombol unduhan
-        st.download_button(
-            label="Unduh KK Pinjaman",
-            data=data,
-            file_name="KK_Pinjaman_Output.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-    except Exception as e:
-        st.error(f"Terjadi kesalahan saat mengunduh KK Pinjaman: {e}")
-
-# Tombol untuk mengunduh file Excel KK Simpanan
-if st.button("Unduh Kertas Kerja Simpanan"):
-    try:
+                st.download_button(
+                    label="Unduh KK Pinjaman",
+                    data=data,
+                    file_name="KK_Pinjaman_Output.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            except Exception as e:
+                st.error(f"Terjadi kesalahan saat mengunduh KK Pinjaman: {e}")
+        
+        # Tombol untuk mengunduh file Excel KK Simpanan
+        if st.button("Unduh Kertas Kerja Simpanan"):
+            try:
         # Menulis KK Simpanan ke file
-        with pd.ExcelWriter("KK_Simpanan_Output.xlsx") as writer:
-            kk_simpanan.to_excel(writer, sheet_name="KK Simpanan", index=False)
+                with pd.ExcelWriter("KK_Simpanan_Output.xlsx") as writer:
+                    kk_simpanan.to_excel(writer, sheet_name="KK Simpanan", index=False)
         
         # Membaca file sebagai binary untuk unduhan
-        with open("KK_Simpanan_Output.xlsx", "rb") as f:
-            data = f.read()
+                with open("KK_Simpanan_Output.xlsx", "rb") as f:
+                    data = f.read()
         
         # Tombol unduhan
-        st.download_button(
-            label="Unduh KK Simpanan",
-            data=data,
-            file_name="KK_Simpanan_Output.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-    except Exception as e:
-        st.error(f"Terjadi kes
+                st.download_button(
+                    label="Unduh KK Simpanan",
+                    data=data,
+                    file_name="KK_Simpanan_Output.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            except Exception as e:
+                st.error(f"Terjadi kesalahan saat mengunduh KK Simpanan: {e}")
