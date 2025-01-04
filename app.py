@@ -18,7 +18,10 @@ if file_pinjaman and file_simpanan:
 
         # Filter data sesuai kriteria
         pinjaman = pinjaman[pinjaman["Status Pinjaman"] == "AKTIF"]  # Hanya pinjaman aktif
-        simpanan = simpanan[simpanan["Sts. Anggota"] == "AKTIF"]  # Hanya anggota aktif
+        simpanan = simpanan[simpanan["Sts. Simpanan"] == "AKTIF"]  # Hanya anggota aktif
+
+        # Konversi format tanggal sebelum membuat KK Pinjaman
+        pinjaman["Disb. Date"] = pd.to_datetime(pinjaman["Disb. Date"]).dt.strftime("%d/%m/%Y")
 
         # Input filter Center ID
         center_ids = st.multiselect("Pilih Center ID", options=pinjaman["Center ID"].unique())
@@ -48,7 +51,7 @@ if file_pinjaman and file_simpanan:
         kk_simpanan = simpanan[[
             "Account No", "Client ID", "Client Name", "Product Name", "Officer Name", "Saldo"
         ]].copy()
-        kk_simpanan["Saldo Buku"] = kk_simpanan["Saldo"]  # Saldo Buku diambil dari Saldo
+        kk_simpanan["Saldo Buku"] = None
         kk_simpanan["Saldo Selisih"] = None
         kk_simpanan["Buku (SPO, SWA, SSU, SPE)"] = None
         kk_simpanan["Kartu SIHARA"] = None
