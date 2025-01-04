@@ -17,7 +17,7 @@ if file_pinjaman and file_simpanan:
         simpanan = pd.read_excel(file_simpanan, skiprows=1)
 
         # Filter data sesuai kriteria
-        pinjaman = pinjaman[pinjaman["Tgl. Keluar"] == "AKTIF"]  # Hanya pinjaman aktif
+        pinjaman = pinjaman[pinjaman["Status Pinjaman"] == "AKTIF"]  # Hanya pinjaman aktif
         simpanan = simpanan[simpanan["Sts. Anggota"] == "AKTIF"]  # Hanya anggota aktif
 
         # Input filter Center ID
