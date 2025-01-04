@@ -1,77 +1,77 @@
+import streamlit as st
 import pandas as pd
 
-# File paths for input files
-file_pinjaman = 'DbPinjaman.xlsx'
-file_simpanan = 'DbSimpanan.xlsx'
+# Judul aplikasi
+st.title("Kertas Kerja Simpanan dan Pinjaman")
 
-# Read the Excel files
-pinjaman = pd.read_excel(file_pinjaman, skiprows=1)
-simpanan = pd.read_excel(file_simpanan, skiprows=1)
+# Upload file untuk DbPinjaman.xlsx
+file_pinjaman = st.file_uploader("Unggah file DbPinjaman.xlsx", type=["xlsx"])
+# Upload file untuk DbSimpanan.xlsx
+file_simpanan = st.file_uploader("Unggah file DbSimpanan.xlsx", type=["xlsx"])
 
-# Filter DbSimpanan based on 'Sts. Anggota' = 'AKTIF'
-simpanan_filtered = simpanan[simpanan['Sts. Anggota'].str.upper() == 'AKTIF']
+# Validasi bahwa kedua file harus diunggah
+if file_pinjaman and file_simpanan:
+    try:
+        # Membaca file Excel
+        pinjaman = pd.read_excel(file_pinjaman, skiprows=1)
+        simpanan = pd.read_excel(file_simpanan, skiprows=1)
 
-# Filter DbPinjaman based on 'Tanggal Keluar' is null
-pinjaman_filtered = pinjaman[pinjaman['Tgl. Keluar'].str.upper() == 'AKTIF']
+        # Filter data sesuai kriteria
+        pinjaman = pinjaman[pinjaman["Tanggal Keluar"].isna()]  # Hanya pinjaman aktif
+        simpanan = simpanan[simpanan["Sts. Anggota"] == "AKTIF"]  # Hanya anggota aktif
 
-# Function to prepare KK Pinjaman
-def create_kk_pinjaman(data):
-    kk_pinjaman = pd.DataFrame({
-        'No.': range(1, len(data) + 1),
-        'Client ID': data['Client ID'],
-        'Loan No.': data['Loan No.'],
-        'Client Name': data['Client Name'],
-        'Meeting Day': data['Meeting Day'],
-        'Product Name': data['Product Name'],
-        'Loan Amount': data['Loan Amount'],
-        'Outstanding': data['Outstanding'],
-        'Purpose Name': data['Purpose Name'],
-        'Officer Name': data['Officer Name'],
-        'Disb. Date': data['Disb. Date'],
-        'Saldo Buku': '',  # Empty
-        'Saldo Sistem': data['Outstanding'],
-        'SLS': '',  # Empty
-        'Identitas': '',  # Empty
-        'Form UK': '',  # Empty
-        'Form Keanggotaan': '',  # Empty
-        'Form P3': '',  # Empty
-        'Akad': '',  # Empty
-        'Monitoring Pembiayaan': '',  # Empty
-        'KPA': '',  # Empty
-        'Sesuai/ Tidak sesuai': '',  # Empty
-        'KETERANGAN (Kelemahan)': ''  # Empty
-    })
-    return kk_pinjaman
+        # Input filter Center ID
+        center_ids = st.multiselect("Pilih Center ID", options=pinjaman["Center ID"].unique())
+        if center_ids:
+            pinjaman = pinjaman[pinjaman["Center ID"].isin(center_ids)]
+            simpanan = simpanan[simpanan["Center ID"].isin(center_ids)]
 
-# Function to prepare KK Simpanan
-def create_kk_simpanan(data):
-    kk_simpanan = pd.DataFrame({
-        'No.': range(1, len(data) + 1),
-        'Client ID': data['Client ID'],
-        'Account No.': data['Account No'],
-        'Client Name': data['Client Name'],
-        'Product Name': data['Product Name'],
-        'Officer Name': data['Officer Name'],
-        'Saldo': data['Saldo'],
-        'Saldo Buku': data['Saldo'],
-        'Saldo Selisih': '',  # Empty
-        'Buku (SPO, SWA, SSU, SPE)': '',  # Empty
-        'Kartu SIHARA': '',  # Empty
-        'Kartu Kurban': '',  # Empty
-        'Kartu Sipadan': '',  # Empty
-        'Informasi Buku Simpanan (Sesuai/Tidak Sesuai)': '',  # Empty
-        'KETERANGAN (Kelemahan)': ''  # Empty
-    })
-    return kk_simpanan
+        # Membuat dataframe untuk KK Pinjaman
+        kk_pinjaman = pinjaman[[
+            "Loan No.", "Client ID", "Client Name", "Meeting Day", "Product Name",
+            "Loan Amount", "Outstanding", "Purpose Name", "Officer Name", "Disb. Date"
+        ]].copy()
+        kk_pinjaman["Saldo Buku"] = None  # Kosongkan
+        kk_pinjaman["Saldo Sistem"] = kk_pinjaman["Outstanding"]  # Ambil dari Outstanding
+        kk_pinjaman["SLS"] = None
+        kk_pinjaman["Identitas"] = None
+        kk_pinjaman["Form UK"] = None
+        kk_pinjaman["Form Keanggotaan"] = None
+        kk_pinjaman["Form P3"] = None
+        kk_pinjaman["Akad"] = None
+        kk_pinjaman["Monitoring Pembiayaan"] = None
+        kk_pinjaman["KPA"] = None
+        kk_pinjaman["Sesuai/ Tidak sesuai"] = None
+        kk_pinjaman["KETERANGAN (Kelemahan)"] = None
 
-# Create the KK sheets
-kk_pinjaman = create_kk_pinjaman(pinjaman_filtered)
-kk_simpanan = create_kk_simpanan(simpanan_filtered)
+        # Membuat dataframe untuk KK Simpanan
+        kk_simpanan = simpanan[[
+            "Account No", "Client ID", "Client Name", "Product Name", "Officer Name", "Saldo"
+        ]].copy()
+        kk_simpanan["Saldo Buku"] = kk_simpanan["Saldo"]  # Saldo Buku diambil dari Saldo
+        kk_simpanan["Saldo Selisih"] = None
+        kk_simpanan["Buku (SPO, SWA, SSU, SPE)"] = None
+        kk_simpanan["Kartu SIHARA"] = None
+        kk_simpanan["Kartu Kurban"] = None
+        kk_simpanan["Kartu Sipadan"] = None
+        kk_simpanan["Informasi Buku Simpanan (Sesuai/Tidak Sesuai)"] = None
+        kk_simpanan["KETERANGAN (Kelemahan)"] = None
 
-# Save to Excel output
-output_file = 'Kertas_Kerja_Output.xlsx'
-with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
-    kk_pinjaman.to_excel(writer, sheet_name='KK Pinjaman', index=False)
-    kk_simpanan.to_excel(writer, sheet_name='KK Simpanan', index=False)
+        # Tampilkan dataframe
+        st.subheader("KK Pinjaman")
+        st.dataframe(kk_pinjaman)
 
-print(f"Output saved to {output_file}")
+        st.subheader("KK Simpanan")
+        st.dataframe(kk_simpanan)
+
+        # Tombol untuk mengunduh file Excel
+        if st.button("Unduh Kertas Kerja"):
+            with pd.ExcelWriter("Kertas_Kerja_Output.xlsx") as writer:
+                kk_pinjaman.to_excel(writer, sheet_name="KK Pinjaman", index=False)
+                kk_simpanan.to_excel(writer, sheet_name="KK Simpanan", index=False)
+            st.success("File berhasil dibuat. Silakan unduh!")
+
+    except Exception as e:
+        st.error(f"Terjadi kesalahan: {e}")
+else:
+    st.warning("Silakan unggah kedua file untuk melanjutkan.")
