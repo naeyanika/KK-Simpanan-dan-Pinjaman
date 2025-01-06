@@ -3,6 +3,7 @@ import pandas as pd
 
 # Judul aplikasi
 st.title("Kertas Kerja Simpanan dan Pinjaman")
+st.write("""File ini berisikan DbSimpanan.xlsx dan DbPinjaman.xlsx sesuai dengan periode audit, jangan hapus header. Upload Sesuai dengan kolom upload yang tersedia""")
 
 # Upload file untuk DbPinjaman.xlsx
 file_pinjaman = st.file_uploader("Unggah file DbPinjaman.xlsx", type=["xlsx"])
